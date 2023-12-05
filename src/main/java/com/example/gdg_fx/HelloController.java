@@ -464,9 +464,9 @@ public class HelloController {
         /**
          * get the relative path of normal ground in Maven structure
          */
-        String path = HelloApplication.class.getResource("com/example/gdg_fx/square.png").toString();
-        String startImagePath = HelloApplication.class.getResource("com/example/gdg_fx/start.png").toString();
-        String finishImagePath = HelloApplication.class.getResource("com/example/gdg_fx/finish.png").toString();
+        String path = HelloApplication.class.getResource("square.png").toString();
+        String startImagePath = HelloApplication.class.getResource("start.png").toString();
+        String finishImagePath = HelloApplication.class.getResource("finish.png").toString();
 
 
 
@@ -732,7 +732,7 @@ public class HelloController {
      * @param pos position of bottomless pit
      */
     private void addBottomlessPit(int pos){
-        String path = HelloApplication.class.getResource("com/example/gdg_fx/bottomlessPit.jpg").toString();
+        String path = HelloApplication.class.getResource("bottomlessPit.jpg").toString();
         Image image = new Image(path);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(42);
@@ -769,7 +769,7 @@ public class HelloController {
      * @param pos position of teleporter
      */
     private void addTeleporter(int pos){
-        String path = HelloApplication.class.getResource("com/example/gdg_fx/teleporter.png").toString();
+        String path = HelloApplication.class.getResource("teleporter.png").toString();
         Image image = new Image(path);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(42);
@@ -795,7 +795,7 @@ public class HelloController {
      * @param pos position of fire pit
      */
     private void addFirePit(int pos){
-        String path = HelloApplication.class.getResource("com/example/gdg_fx/firepit.png").toString();
+        String path = HelloApplication.class.getResource("firepit.png").toString();
         Image image = new Image(path);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(42);
