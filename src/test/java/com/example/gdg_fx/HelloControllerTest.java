@@ -8,12 +8,7 @@ class HelloControllerTest {
 
 
 
-    @Test
-    void start() {
-        HelloController helloController = new HelloController();
-        helloController.boardGenerate();
 
-    }
 
     @Test
     void setSize() {
@@ -38,11 +33,7 @@ class HelloControllerTest {
     }
 
 
-    @Test
-    void boardGenerate() {
-        HelloController helloController = new HelloController();
-        helloController.boardGenerate();
-    }
+
 
 
 

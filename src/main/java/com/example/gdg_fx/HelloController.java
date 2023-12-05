@@ -1,20 +1,18 @@
 package com.example.gdg_fx;
 
 import GameFunctions.Functions;
-import javafx.animation.TranslateTransition;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Line;
-import javafx.util.Duration;
+import javafx.collections.ObservableList;
 import unity.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+
 
 /**
  * FXML controller of the javaFx project
@@ -28,113 +26,86 @@ public class HelloController {
     Functions fc = new Functions();
 
     /**
-     * fxml element showing player1's name
+     * Set id to fxml elements
      */
     @FXML
-    protected Label Player1_Name_Label;
+    private Label Player1_Name_Label;
 
-    /**
-     * fxml element showing player2's name
-     */
     @FXML
-    protected Label Player2_Name_Label;
+    private Label Player2_Name_Label;
 
-    /**
-     * fxml label shoing rollNum
-     */
     @FXML
-    protected Label rollNum;
+    private Label rollNum;
 
-    /**
-     * fxml label shoing player1's score
-     */
     @FXML
-    protected Label Score_p1;
+    private Label Score_p1;
 
-    /**
-     * fxml label shoing player2's score
-     */
     @FXML
-    protected Label Score_p2;
+    private Label Score_p2;
 
-    /**
-     * fxml TextField where user input board size
-     */
     @FXML
-    protected TextField Setsize;
+    private TextField Setsize;
 
-    /**
-     * fxml TextField where player1 input name
-     */
     @FXML
-    protected TextField name1;
+    private TextField name1;
 
-    /**
-     * fxml TextField where player2 input name
-     */
     @FXML
-    protected TextField name2;
+    private TextField name2;
 
-    /**
-     * fxml ImageView of player1
-     */
     @FXML
-    protected ImageView player1;
-    /**
-     * fxml ImageView of player2
-     */
+    private ImageView player1;
+
     @FXML
-    public ImageView player2;
+    private ImageView player2;
 
-    /**
-     * fxml AnchorPane, an area contains all the fxml elements
-     */
     @FXML
-    protected AnchorPane chessboard;
+    private AnchorPane chessboard;
 
-    /**
-     * fxml player1's roll button
-     */
     @FXML
-    protected Button P1_roll;
+    private Button P1_roll;
 
-    /**
-     * fxml player2's roll button
-     */
     @FXML
-    protected Button P2_roll;
+    private Button P2_roll;
 
-    /**
-     * fxml button to set name for p1
-     */
     @FXML
-    protected Button setName_button1;
+    private Button Btn_Start;
 
-    /**
-     * fxml button to set name for p2
-     */
+//    @FXML
+////    private Button setName_button1;
+
+//    @FXML
+//    private Button setName_button2;
+
     @FXML
-    protected Button setName_button2;
+    private Button setSize_Button;
 
-    /**
-     * fxml button to set size for the board(distance between start and end)
-     */
     @FXML
-    protected Button setSize_Button;
+    private ComboBox<String> difficultyComboBox;
+
+    @FXML
+    private void initialize() {
+
+        // Initialize ComboBox items
+        ObservableList<String> difficultyLevels = FXCollections.observableArrayList("Easy", "Medium", "Hard");
+        difficultyComboBox.setItems(difficultyLevels);
+    }
+    @FXML
+    private void onDifficultySelected() {
+        // Handle the selected difficulty logic here
+
+        // After selecting a difficulty, request focus on the name1 TextField
+        name1.requestFocus();
+    }
 
     /**
-     * An arrayList stores every ImageView(fxml element, the squares in fxml)
+     * An arrayList stores every ImageView(fxml element)
      */
-    ArrayList<ImageView> areas = new ArrayList<ImageView>();
+    private ArrayList<ImageView> areas = new ArrayList<ImageView>();
 
     /**
-     * Init Player1
+     * Init 2 Players
      */
     Player player_1 = new Player(0,"Player1",0);
-
-    /**
-     * init player2
-     */
     Player player_2 = new Player(0,"Player2",0);
     /**
      * An arrayList stores type of obstacles of each position
@@ -151,23 +122,30 @@ public class HelloController {
      * start() function which attached to start button
      * check if board size bigger than 0, if not show alert
      * @see #boardGenerate() generate the board without obstructions by board size
-     * @see #GenerateObs() generate obstructions
-     * Set P1 roll button visiable to start the turn of Player1
+    //     * @see #GenerateObs() generate obstructions
+     * Set P1 roll button visiable
      * then show the alert to inform Player1 first roll
      */
     @FXML
     protected void start() {
 
+
+
         //System.out.println(board.getSize());
         if(board.getSize() > 0){
             boardGenerate();
 
-            GenerateObs();
+//            GenerateObs();
+
+
+            String selectedDifficulty = difficultyComboBox.getValue();
+            GenerateObs(selectedDifficulty);
+
 
             P1_roll.setVisible(true);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
-            alert.setContentText("P1 first roll");
+            alert.setContentText(name1.getText() + " first roll");
             alert.showAndWait();
         }else{
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -175,6 +153,21 @@ public class HelloController {
             alert.setContentText("Please set board size first");
             alert.showAndWait();
         }
+        if(Objects.equals(name1.getText(), "") || Objects.equals(name2.getText(), "")){
+            ;
+
+            player_1.setName(Player1_Name_Label.getText());
+            name1.setVisible(false);
+            player_2.setName(Player2_Name_Label.getText());
+            name2.setVisible(false);
+        }else{
+            setName1();
+            setName2();
+        }
+
+        Btn_Start.setVisible(false);
+        difficultyComboBox.setVisible(false);
+
 
 //        for(int i = 0 ; i < TypeList.size(); i++){
 //            System.out.println(TypeList.get(i));
@@ -206,6 +199,7 @@ public class HelloController {
             Setsize.setVisible(false);
             showAlert("set size success!");
         }
+        difficultyComboBox.requestFocus();
 
     }
     /**
@@ -221,11 +215,11 @@ public class HelloController {
 
         Player1_Name_Label.setText(UserInput);
 
-        setName_button1.setVisible(false);
+//        setName_button1.setVisible(false);
 
         name1.setVisible(false);
 
-        showAlertSetName();
+//        showAlertSetName();
 
 
     }
@@ -243,7 +237,7 @@ public class HelloController {
 
         Player2_Name_Label.setText(UserInput);
 
-        setName_button2.setVisible(false);
+//        setName_button2.setVisible(false);
 
         name2.setVisible(false);
 
@@ -273,7 +267,7 @@ public class HelloController {
         rollNum.setText(String.valueOf(steps));
         player_1.score += steps;
         Score_p1.setText("score: "+player_1.getScore());
-        showAlert("Your roll:"+steps);
+        showAlert(name1.getText() + ": " + steps);
         int new_pos = player_1.pos + steps;
         /**
          * if the player's next position is the other player's position,
@@ -381,11 +375,11 @@ public class HelloController {
         if(player_2.pos>=1){
             areas.get(player_2.pos-1).setVisible(true);
         }
-        //int steps = fc.DiceRoll();
-        int steps = 9;
+        int steps = fc.DiceRoll();
+        //int steps = 2;
 
         rollNum.setText(String.valueOf(steps));
-        showAlert("Your roll:"+steps);
+        showAlert(name2.getText() + ":" +steps);
 
         player_2.score += steps;
         Score_p2.setText("score: "+player_2.getScore());
@@ -450,6 +444,8 @@ public class HelloController {
 
     }
 
+
+
     /**
      * method to generate board without obstruction.
      * it is generated by spiral structure.
@@ -462,17 +458,35 @@ public class HelloController {
         int size = board.getSize();
         int x_margin = 70;
         int y_margin = 55;
+
+
+
         /**
          * get the relative path of normal ground in Maven structure
          */
-        String path = HelloApplication.class.getResource("square.png").toString();
+        String path = HelloApplication.class.getResource("com/example/gdg_fx/square.png").toString();
+        String startImagePath = HelloApplication.class.getResource("com/example/gdg_fx/start.png").toString();
+        String finishImagePath = HelloApplication.class.getResource("com/example/gdg_fx/finish.png").toString();
+
+
 
         for(int i = 1; i <= size; i++){
+
             Image image = new Image(path);
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(48);
             imageView.setFitHeight(48);
             imageView.setId("s"+i);
+
+            if (i == 1) {
+                // Set start image on the first box
+                Image startImage = new Image(startImagePath);
+                imageView.setImage(startImage);
+            } else if (i == size) {
+                // Set finish image on the last box
+                Image finishImage = new Image(finishImagePath);
+                imageView.setImage(finishImage);
+            }
 
             LineDraw();
 
@@ -536,6 +550,12 @@ public class HelloController {
             areas.add(imageView);
             chessboard.getChildren().add(imageView);
 
+
+//
+//            Image imageStart = new Image(StartPath);
+//            ImageView imageViewStart = new ImageView(imageStart);
+//            chessboard.getChildren().add(imageViewStart);
+
         }
     }
 
@@ -544,9 +564,10 @@ public class HelloController {
      */
     private void showAlertSetName() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Name Set");
+        alert.setTitle("Simon’s Obstacle Course");
         alert.setHeaderText(null);
-        alert.setContentText("Set Name success !");
+//        alert.setContentText("Set Name success !");
+        alert.setContentText("Welcome " + name1.getText() + " and " + name2.getText() + " to the treacherous board of hell");
 
         alert.showAndWait();
     }
@@ -618,143 +639,100 @@ public class HelloController {
 
     /**
      * generate obstructions as board size increases
+     *
+     * @return
      * @see #addBottomlessPit(int) add bottomlesspit to fxml
      * @see #addTeleporter(int) add teleporter to fxml
      * @see #addFirePit(int) add fire pit to fxml
      */
-    protected void GenerateObs(){
-        //generate Obstruction as size increases
+
+
+    private boolean GenerateObs(String difficulty) {
         int size = board.getSize();
 
-        if(size >= 20 && size < 30){
-            addTeleporter(2);
-            addBottomlessPit(6);
-            addFirePit(12);
-            addTeleporter(14);
-            addFirePit(8);
-            addBottomlessPit(19);
-        } else if (size >= 30 && size < 40) {
-            addTeleporter(2);
-            addBottomlessPit(6);
-            addFirePit(12);
-            addTeleporter(14);
-            addFirePit(8);
-            addBottomlessPit(19);
-
-            addFirePit(24);
-
-            addBottomlessPit(26);
-        } else if (size >= 40 && size < 50) {
-            addTeleporter(2);
-            addBottomlessPit(6);
-            addFirePit(12);
-            addTeleporter(14);
-            addFirePit(8);
-            addBottomlessPit(19);
-
-            addFirePit(24);
-
-            addBottomlessPit(26);
-
-            addTeleporter(30);
-            addFirePit(38);
-        }else if (size >= 50 && size < 60) {
-            addTeleporter(2);
-            addBottomlessPit(6);
-            addFirePit(12);
-            addTeleporter(14);
-            addFirePit(8);
-            addBottomlessPit(19);
-
-            addFirePit(24);
-
-            addBottomlessPit(26);
-
-            addTeleporter(30);
-            addFirePit(38);
-
-            addTeleporter(42);
-            addBottomlessPit(45);
-        }else if (size >= 60 && size < 70) {
-            addTeleporter(2);
-            addBottomlessPit(6);
-            addFirePit(12);
-            addTeleporter(14);
-            addFirePit(8);
-            addBottomlessPit(19);
-
-            addFirePit(24);
-
-            addBottomlessPit(26);
-
-            addTeleporter(30);
-            addFirePit(38);
-
-            addTeleporter(42);
-            addBottomlessPit(45);
-
-            addBottomlessPit(55);
-
-            addBottomlessPit(59);
-        }
-        else if (size >= 70 && size < 80) {
-            addTeleporter(2);
-            addBottomlessPit(6);
-            addFirePit(12);
-            addTeleporter(14);
-            addFirePit(8);
-            addBottomlessPit(19);
-
-            addFirePit(24);
-
-            addBottomlessPit(26);
-
-            addTeleporter(30);
-            addFirePit(38);
-
-            addTeleporter(42);
-            addBottomlessPit(45);
-
-            addBottomlessPit(55);
-
-            addBottomlessPit(59);
-            addTeleporter(77);
-        }else {
-            addTeleporter(2);
-            addBottomlessPit(6);
-            addFirePit(12);
-            addTeleporter(14);
-            addFirePit(8);
-            addBottomlessPit(19);
-
-            addFirePit(24);
-
-            addBottomlessPit(26);
-
-            addTeleporter(30);
-            addFirePit(38);
-
-            addTeleporter(42);
-            addBottomlessPit(45);
-
-            addBottomlessPit(55);
-
-            addBottomlessPit(59);
-            addTeleporter(77);
-            addFirePit(81);
-            addBottomlessPit(83);
-            addTeleporter(87);
+        // Define the valid range for obstacle positions (excluding first and last positions)
+        List<Integer> validPositions = new ArrayList<>();
+        for (int i = 2; i < size - 1; i++) {
+            validPositions.add(i);
         }
 
+        // Shuffle the list to get random positions
+        Collections.shuffle(validPositions);
+
+
+        int obstacleCount;
+        switch (difficulty) {
+            case "Easy":
+                obstacleCount = Math.min(10, validPositions.size());
+                break;
+            case "Medium":
+                obstacleCount = Math.min(15, validPositions.size());
+                break;
+            case "Hard":
+                obstacleCount = Math.min(20, validPositions.size());
+                break;
+            default:
+                obstacleCount = 0;
+                break;
+        }
+
+        // Determine the number of obstacles based on the board size
+        List<Integer> obstaclePositions = new ArrayList<>();
+        int lastObstaclePosition = -1;
+
+        for (int i = 0; i < obstacleCount; i++) {
+            int obstaclePosition;
+            do {
+                obstaclePosition = validPositions.get((int) (Math.random() * validPositions.size()));
+            } while (isAdjacent(obstaclePosition, lastObstaclePosition) || obstaclePositions.contains(obstaclePosition));
+
+            // Update the lastObstaclePosition and track the obstaclePosition
+            lastObstaclePosition = obstaclePosition;
+            obstaclePositions.add(obstaclePosition);
+
+            // You can add different types of obstacles here based on your requirements
+            // For example, you can use addTeleporter(obstaclePosition), addBottomlessPit(obstaclePosition), etc.
+            addRandomObstacle(obstaclePosition);
+
+
+
+
+        }
+
+        return true;
     }
+
+    private boolean isAdjacent(int position1, int position2) {
+        return Math.abs(position1 - position2) == 1;
+    }
+
+    // Example method to add a random obstacle at the specified position
+    private void addRandomObstacle(int position) {
+        // You can customize this method to add different types of obstacles based on your requirements
+        // For example, you can randomly choose between addTeleporter(position), addBottomlessPit(position), etc.
+        int obstacleType = (int) (Math.random() * 3); // Assuming you have 3 types of obstacles
+        switch (obstacleType) {
+            case 0:
+                addTeleporter(position);
+                break;
+            case 1:
+                addBottomlessPit(position);
+                break;
+            case 2:
+                addFirePit(position);
+                break;
+        }
+    }
+
+
 
 
     /**
      * method to generate bottomless pit with position(pos) on the board
      * @param pos position of bottomless pit
      */
-    protected void addBottomlessPit(int pos){
-        String path = HelloApplication.class.getResource("bottomlessPit.jpg").toString();
+    private void addBottomlessPit(int pos){
+        String path = HelloApplication.class.getResource("com/example/gdg_fx/bottomlessPit.jpg").toString();
         Image image = new Image(path);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(42);
@@ -790,8 +768,8 @@ public class HelloController {
      * just change the obstruction type
      * @param pos position of teleporter
      */
-    protected void addTeleporter(int pos){
-        String path = HelloApplication.class.getResource("teleporter.png").toString();
+    private void addTeleporter(int pos){
+        String path = HelloApplication.class.getResource("com/example/gdg_fx/teleporter.png").toString();
         Image image = new Image(path);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(42);
@@ -816,8 +794,8 @@ public class HelloController {
      * just change the obstruction type
      * @param pos position of fire pit
      */
-    protected void addFirePit(int pos){
-        String path = HelloApplication.class.getResource("firepit.png").toString();
+    private void addFirePit(int pos){
+        String path = HelloApplication.class.getResource("com/example/gdg_fx/firepit.png").toString();
         Image image = new Image(path);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(42);
@@ -848,7 +826,7 @@ public class HelloController {
      * @param pitpos an int to record the teleporter's position.
      * else itself will be sent to a random place
      */
-    public void TeleporterChoiceDialog(int next_pos,int pitpos) {
+    private void TeleporterChoiceDialog(int next_pos,int pitpos) {
         List<String> choices = new ArrayList<>();
         choices.add("me");
         choices.add("Player 2");
@@ -880,7 +858,7 @@ public class HelloController {
      * @param next_pos an int to record the random position a player will be sent to.
      * @param pitpos an int to record the teleporter's position.
      */
-    public void TeleporterChoiceDialog2(int next_pos,int pitpos) {
+    private void TeleporterChoiceDialog2(int next_pos,int pitpos) {
         List<String> choices = new ArrayList<>();
         choices.add("me");
         choices.add("Player 1");
@@ -911,11 +889,10 @@ public class HelloController {
      * then set the player's layout position the same as the imageView where the player will be set
      * For example, if player will be set in 6
      * then the player will be set to the layout position of 6th imageView of areas
-     * And the previous imageView will be set to invisible
      * @param player player to be set
      * @param new_pos position of player to be set
      */
-    protected void setPlayerPos(Player player, int new_pos){
+    private void setPlayerPos(Player player, int new_pos){
         if(player == player_1){
             player_1.setPos(new_pos);
             player1.setLayoutX(areas.get(new_pos-1).getLayoutX());
